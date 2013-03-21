@@ -1,0 +1,37 @@
+{
+  "name": "graphite",
+  "description": "Graphite carbon client",
+  "version": "0.1.0",
+  "homepage": "https://github.com/afajl/graphitejs",
+  "author": {
+    "name": "Paul Diaconescu",
+    "email": "p@afajl.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/afajl/graphitejs.git"
+  },
+  "bugs": {
+    "url": "https://github.com/afajl/graphitejs/issues"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://github.com/afajl/graphitejs/blob/master/LICENSE-MIT"
+    }
+  ],
+  "main": "lib/graphite",
+  "engines": {
+    "node": ">= 0.8.0"
+  },
+  "scripts": {
+    "test": "grunt nodeunit"
+  },
+  "devDependencies": {
+    "grunt-contrib-jshint": "~0.1.1",
+    "grunt-contrib-nodeunit": "~0.1.2",
+    "grunt-contrib-watch": "~0.2.0",
+    "grunt": "~0.4.1"
+  },
+  "keywords": []
+}
