@@ -2,37 +2,41 @@
 
 var graphite = require('../lib/graphite.js');
 var net = require('net');
-
+var EventEmitter = require('events').EventEmitter;
+//var util = require('util');
 /*
-  ======== A Handy Little Nodeunit Reference ========
-  https://github.com/caolan/nodeunit
+var TestServer = function (func) {
+    this.host = '127.0.0.1';
+    this.port = 9876;
+};
 
-  Test methods:
-    test.expect(numAssertions)
-    test.done()
-  Test assertions:
-    test.ok(value, [message])
-    test.equal(actual, expected, [message])
-    test.notEqual(actual, expected, [message])
-    test.deepEqual(actual, expected, [message])
-    test.notDeepEqual(actual, expected, [message])
-    test.strictEqual(actual, expected, [message])
-    test.notStrictEqual(actual, expected, [message])
-    test.throws(block, [error], [message])
-    test.doesNotThrow(block, [error], [message])
-    test.ifError(value)
+TestServer.prototype.start = function () {
+    var that = this;
+    this.server = net.createServer(func (socket) {
+        that.conn_count++;
+        return this.func(socket);
+    }).listen(this.port, this.host); 
+};
 */
 
-exports.socket = {
 
+
+
+exports.socket = {
   setUp: function(done) {
-    this.received = [];
+    var received = this.received = [];
+    var events = this.events = new EventEmitter();
     this.server = net.createServer(function (c) {
+        console.log('server started');
         c.on('data', function (data) {
-            console.log('recieved ' + data);
-            this.received.push(data);
+            received.push(data);
+            console.log("%s", data);
+            events.emit('data');
         });
-    }).listen(9876, done);
+        c.on('end', function () {
+            events.emit('end');
+        });
+    }).listen(9876, '127.0.0.1', done);
   },
 
   tearDown: function(done) {
@@ -40,12 +44,26 @@ exports.socket = {
   },
 
   'send one line': function(test) {
-    var conn = graphite.connect(9876);   
     var that = this;
+    var conn = graphite.connect(9876, '127.0.0.1');   
     conn.write('one line', function () {
+        conn.close();
+    });
+    this.events.on('data', function () {
         test.equal(that.received.length, 1);
         test.done();
     });
-    console.log('in teardown', this.received);
-  }
+  },
+  'send two lines': function(test) {
+    var that = this;
+    var conn = graphite.connect(9876, '127.0.0.1');   
+    conn.write('line 1');
+    conn.write('line 2', function () { 
+        conn.close();
+    });
+    this.events.on('end', function () {
+        test.equal(that.received.length, 2);
+        test.done();
+    });
+  } 
 };
